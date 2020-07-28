@@ -1,24 +1,49 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Menu from './components/Menu';
+import BannerMain from './components/BannerMain';
+import dadosIniciais from './data/dados_iniciais.json';
+import Carousel from './components/Carousel';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ background: "#141414" }}>
+      <Menu/>
+
+      <BannerMain
+        videoTitle={dadosIniciais.categorias[0].videos[0].titulo}
+        url={dadosIniciais.categorias[0].videos[0].url}
+        videoDescription={"O que é front-end? Trabalhando na área...."}
+      />
+
+      <Carousel
+        ignoreFirstVideo
+        category={dadosIniciais.categorias[0]}
+      />
+
+      <Carousel
+        ignoreFirstVideo
+        category={dadosIniciais.categorias[1]}
+      />
+
+      <Carousel
+        ignoreFirstVideo
+        category={dadosIniciais.categorias[2]}
+      />
+
+      <Carousel
+        ignoreFirstVideo
+        category={dadosIniciais.categorias[3]}
+      />
+
+      <Carousel
+        ignoreFirstVideo
+        category={dadosIniciais.categorias[4]}
+      />
+
+      <Carousel
+        ignoreFirstVideo
+        category={dadosIniciais.categorias[5]}
+      />
     </div>
   );
 }
