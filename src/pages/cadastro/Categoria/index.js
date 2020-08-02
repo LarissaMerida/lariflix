@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import PageDefault from '../../../components/PageDefault';
 import FormField from '../../../components/FormField';
 import Button from '../../../components/Button';
+import useForm from '../../../hooks/useForm';
 
 function CadastroCategoria() {
   const valoresIniciais = {
@@ -11,30 +12,14 @@ function CadastroCategoria() {
     cor: '',
   };
 
+  const { valores, handleChange, clearForm } = useForm(valoresIniciais);
+
   const [categorias, setCategorias] = useState([]);
-  const [valores, setValores] = useState(valoresIniciais);
-
-  function setValor(chave, valor) {
-    // chave: nome, descricao, cor
-    setValores({
-      ...valores,
-      [chave]: valor,
-    });
-  }
-
-  function handleChange(infosDoEvento) {
-    const { name, value } = infosDoEvento.target;
-
-    setValor(
-      name,
-      value,
-    );
-  }
 
   useEffect(() => {
     const URL = window.location.hostname.includes('localhost')
-    ? 'http://localhost:8080/categorias'
-    : 'https://lariflix-nine.herokuapp.com/categorias';
+      ? 'http://localhost:8080/categorias'
+      : 'https://lariflix-nine.herokuapp.com/categorias';
     fetch(URL)
       .then(async (respostaDoServidor) => {
         const resposta = await respostaDoServidor.json();
@@ -77,7 +62,7 @@ function CadastroCategoria() {
             ...categorias, // destrinche todas as categorias e add a de baixo
             valores,
           ]);
-          setValores(valoresIniciais);
+          clearForm(valoresIniciais);
         }}
       >
 
@@ -117,8 +102,8 @@ function CadastroCategoria() {
 
       <ul>
         {categorias.map((categoria, indice) => (
-          <li key={`${categoria.nome}${indice}`}>
-            {categoria.nome}
+          <li key={`${categoria.id}`}>
+            {categoria.id}
           </li>
         ))}
       </ul>
