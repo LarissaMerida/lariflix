@@ -1,32 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import PageDefault from '../../../components/PageDefault';
 import FormField from '../../../components/FormField';
 import Button from '../../../components/Button';
 import useForm from '../../../hooks/useForm';
+import categoriasRepository from '../../../repositories/categorias';
 
 function CadastroCategoria() {
   const valoresIniciais = {
-    nome: '',
-    descricao: '',
+    titulo: '',
     cor: '',
+    link_extra: {
+      text: '',
+      url: ''
+    }
   };
+
+  const history = useHistory();
 
   const { valores, handleChange, clearForm } = useForm(valoresIniciais);
 
   const [categorias, setCategorias] = useState([]);
 
   useEffect(() => {
-    const URL = window.location.hostname.includes('localhost')
-      ? 'http://localhost:8080/categorias'
-      : 'https://lariflix-nine.herokuapp.com/categorias';
-    fetch(URL)
-      .then(async (respostaDoServidor) => {
-        const resposta = await respostaDoServidor.json();
-        setCategorias([
-          ...resposta,
-        ]);
-      });
+    // inicio as categorias com dados do banco
+    categoriasRepository
+      .getAll()
+      .then((categorias) => {
+        setCategorias(categorias);
+      }, []);
 
     // setTimeout(() => {
     //   setCategorias([
@@ -56,31 +58,50 @@ function CadastroCategoria() {
 
       <form
         // style={{ background: valores.cor }}
-        onSubmit={function handleSubmit(infosDoEvento) {
-          infosDoEvento.preventDefault();
-          setCategorias([
-            ...categorias, // destrinche todas as categorias e add a de baixo
-            valores,
-          ]);
-          clearForm(valoresIniciais);
-        }}
+        onSubmit={
+          function handleSubmit(infosDoEvento) {
+            infosDoEvento.preventDefault();
+
+            categoriasRepository.create({
+              titulo: valores.titulo,
+              // descricao: valores.descricao,
+              cor: valores.cor,
+              link_extra: {
+                text: valores.link_extra.text,
+                url: valores.link_extra.url,
+              }
+            })
+              .then(() => {
+                console.log('Cadastrou com sucesso');
+                history.push('/');
+              });
+          }
+        }
       >
 
         <FormField
-          label="Nome da categoria"
+          label="Título da categoria"
           type="text"
-          name="nome"
-          value={valores.nome}
+          name="titulo"
+          value={valores.titulo}
+          onChange={handleChange}
+        />
+
+        {/* <FormField
+          label="Descrição"
+          type="textarea"
+          name="text"
+          value={valores.link_extra.text}
           onChange={handleChange}
         />
 
         <FormField
-          label="Descrição"
-          type="textarea"
-          name="descricao"
-          value={valores.descricao}
+          label="URL"
+          type="text"
+          name="url"
+          value={valores.link_extra.url}
           onChange={handleChange}
-        />
+        /> */}
 
         <FormField
           label="Cor"
@@ -101,9 +122,29 @@ function CadastroCategoria() {
       )}
 
       <ul>
-        {categorias.map((categoria, indice) => (
-          <li key={`${categoria.id}`}>
-            {categoria.id}
+        {categorias.map((categoria) => (
+          <li key={`${categoria.id}${categoria.titulo}`}>
+            {categoria.titulo}
+
+            <form
+              onSubmit={
+                  function handleSubmit(infosDoEvento) {
+                    infosDoEvento.preventDefault();
+
+                    categoriasRepository.deleta(
+                      categoria.id,
+                    )
+                      .then(() => {
+                        console.log('Deletou com sucesso');
+                        history.push('/');
+                      });
+                  }
+                }
+            >
+              <Button>
+                Deletar
+              </Button>
+            </form>
           </li>
         ))}
       </ul>
